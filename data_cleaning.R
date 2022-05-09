@@ -1,10 +1,10 @@
+#Empty the environment and re-run if needed
+#rm(list=ls()) 
+
 library(dplyr)
 library(haven)
 library(matchmaker) #replicates the dictionary function of python, to allow mapping
 library(readxl) #enables excel import
-
-#Empty the environment and re-run if needed
-#rm(list=ls()) 
 
 #Source the working directory where you're located
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
@@ -14,10 +14,10 @@ lending_df <- read_dta('Data/Raw/Lending_Club.dta')
 
 #Hand-labelled data on 
 #1 = Blue Collar, #2 = White Collar #3 = Pink Collar
-dictionary <- read_excel('dictionary_emp_title.xlsx')
+dictionary <- read_excel('Data/Clean/dictionary_emp_title.xlsx')
 
 #Census data encoded
-dict_big_city <- read_excel('dictionary_big_cities_census.xlsx')
+dict_big_city <- read_excel('Data/Clean/dictionary_big_cities_census.xlsx')
 
 #duplicate the column and slice it up 
 sliced_1 <- lending_df[, 1:9]
@@ -98,15 +98,31 @@ final_lending <- final_lending %>%
   mutate(big_city = replace(big_city, big_city != 1, 0))
 
 #Convert back the type char to numeric to be able to use it further down the line
-final_lending <- transform(final_lending, big_city = as.numeric(big_city),
+final_lending <- transform(final_lending, 
+                        big_city = as.numeric(big_city),
                         blue_worker = as.numeric(blue_worker),
                         white_worker = as.numeric(white_worker),
                         pink_worker = as.numeric(pink_worker))
 
-#Filter out the NaN values and get the final dataset
+#Filter out the NaN values of encoded columns and get the final dataset
 final_lending <- final_lending %>%
-  filter(big_city < 2, blue_worker < 2, white_worker < 2, pink_worker < 2)
+  filter(big_city < 2,
+         blue_worker < 2,
+         white_worker < 2,
+         pink_worker < 2)
 
+#Specifying the characters columns that withhold empty cells, drop them
+final_lending <- subset(final_lending,
+                        select = -c(hardship_type,
+                                    hardship_reason,
+                                    hardship_status,
+                                    hardship_start_date,
+                                    hardship_end_date,
+                                    payment_plan_start_date,
+                                    hardship_loan_status,
+                                    debt_settlement_flag_date,
+                                    settlement_status,
+                                    settlement_date))
 
 #Correct the issue of storage size on the string length value
 #https://tinyurl.com/bdd24f9a
