@@ -50,7 +50,7 @@ Project Architecture
 │       ├── dict_colonne_encode.xlsx
 │       ├── dictionnaire_de_donnees_Lending_Club.xlsx
 │       └── raw_emp_title_classification.xlsx
-└── src <- pipeline of best identified pre-processing and model
+└── src
     ├── models
     │   ├── script_model_project.R
     ├── plots
